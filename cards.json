@@ -1,92 +1,106 @@
 [
     {
         "id": "card-SWP3615",
-        "name": "SWP 3615",
-        "image": "1.png",
-        "backImage": "1.png",
+        "name": "SWP 3655",
+        "images": [
+            "Uploads\/front_1754143812_688e1c44138fd.jpg",
+            "Uploads\/front_1754143812_688e1c4413b98.jpg",
+            "Uploads\/front_1754143812_688e1c4413e47.jpg"
+        ],
+        "backImage": "Uploads\/back_1754143812_688e1c44140ca.jpg",
         "description": "A luxurious wedding card with intricate gold detailing, perfect for a grand celebration.",
-        "backDetails": "Material: Premium Cardstock, Dimensions: 7x5 inches, Includes: Envelope & RSVP Card",
-        "price": 250,
-        "uploadTime": "2025-08-02T11:13:00+05:30"
+        "backDetails": "Material: Premium Cardstock, Dimensions: 7x5 inches, Includes: Envelope &amp; RSVP Card",
+        "price": 75,
+        "uploadTime": "2025-08-02T10:10:12-04:00"
     },
     {
         "id": "card-ElegantFloral",
         "name": "Elegant Floral",
-        "image": "2.png",
-        "backImage": "2.png",
+        "images": [
+            "Uploads\/front_1754144341_688e1e5545dfb.jpg",
+            "Uploads\/front_1754144341_688e1e55461f7.jpg",
+            "Uploads\/front_1754144341_688e1e55465d4.jpg",
+            "Uploads\/front_1754144341_688e1e5546985.jpg",
+            "Uploads\/front_1754144341_688e1e5546d18.jpg"
+        ],
+        "backImage": "Uploads\/back_1754144341_688e1e55470b1.jpg",
         "description": "A delicate floral-themed card with soft pastel tones, ideal for a romantic wedding.",
         "backDetails": "Material: Matte Paper, Dimensions: 6x6 inches, Includes: Envelope",
         "price": 200,
-        "uploadTime": "2025-08-02T11:13:00+05:30"
+        "uploadTime": "2025-08-02T10:19:01-04:00"
     },
     {
         "id": "card-ClassicDesign",
         "name": "Classic Design",
-        "image": "3.png",
-        "backImage": "3.png",
+        "images": [
+            "http:\/\/forloopused.free.nf\/3.png",
+            "http:\/\/forloopused.free.nf\/4.png",
+            "http:\/\/forloopused.free.nf\/6.png"
+        ],
+        "backImage": "http:\/\/forloopused.free.nf\/2.png",
         "description": "A timeless design with elegant typography and subtle embellishments.",
-        "backDetails": "Material: Textured Cardstock, Dimensions: 5x7 inches, Includes: Envelope & Insert",
+        "backDetails": "Material: Textured Cardstock, Dimensions: 5x7 inches, Includes: Envelope &amp; Insert",
         "price": 180,
-        "uploadTime": "2025-08-02T11:13:00+05:30"
+        "uploadTime": "2025-08-02T11:55:32-04:00"
     },
     {
         "id": "card-ModernMaroon",
         "name": "Modern Maroon",
-        "image": "4.png",
-        "backImage": "4.png",
+        "images": [
+            "http:\/\/forloopused.free.nf\/4.png"
+        ],
+        "backImage": "http:\/\/forloopused.free.nf\/3.png",
         "description": "A bold maroon card with modern geometric patterns, perfect for contemporary weddings.",
         "backDetails": "Material: Glossy Paper, Dimensions: 6x8 inches, Includes: Envelope & Seal",
         "price": 220,
-        "uploadTime": "2025-08-02T11:13:00+05:30"
+        "uploadTime": "2025-08-02T08:57:13-04:00"
     },
     {
         "id": "card-ButterflyJoy",
         "name": "Butterfly Joy",
-        "image": "5.png",
-        "backImage": "5.png",
+        "images": [
+            "http:\/\/forloopused.free.nf\/5.png"
+        ],
+        "backImage": "http:\/\/forloopused.free.nf\/5.png",
         "description": "A vibrant card featuring butterfly motifs, symbolizing love and transformation.",
         "backDetails": "Material: Eco-Friendly Paper, Dimensions: 5x6 inches, Includes: Envelope",
         "price": 190,
-        "uploadTime": "2025-08-02T11:13:00+05:30"
+        "uploadTime": "2025-08-02T08:57:42-04:00"
     },
     {
         "id": "card-ModernCouple",
         "name": "Modern Couple",
-        "image": "7.png",
-        "backImage": "7.png",
+        "images": [
+            "http:\/\/forloopused.free.nf\/6.png"
+        ],
+        "backImage": "http:\/\/forloopused.free.nf\/6.png",
         "description": "A sleek design for modern couples with minimalist aesthetics.",
         "backDetails": "Material: Glossy Cardstock, Dimensions: 6x6 inches, Includes: Envelope & RSVP",
         "price": 230,
-        "uploadTime": "2025-08-02T11:13:00+05:30"
+        "uploadTime": "2025-08-02T08:58:09-04:00"
     },
     {
         "id": "card-RegalRed",
         "name": "Regal Red",
-        "image": "8.png",
-        "backImage": "8.png",
+        "images": [
+            "http:\/\/forloopused.free.nf\/7.png"
+        ],
+        "backImage": "http:\/\/forloopused.free.nf\/7.png",
         "description": "A rich red card with regal patterns, perfect for traditional weddings.",
         "backDetails": "Material: Velvet Finish, Dimensions: 7x5 inches, Includes: Envelope & Seal",
         "price": 260,
-        "uploadTime": "2025-08-02T11:13:00+05:30"
+        "uploadTime": "2025-08-02T08:58:29-04:00"
     },
     {
         "id": "card-PurpleSerenity",
         "name": "Purple Serenity",
-        "image": "9.png",
-        "backImage": "9.png",
+        "images": [
+            "http:\/\/forloopused.free.nf\/8.png"
+        ],
+        "backImage": "http:\/\/forloopused.free.nf\/8.png",
         "description": "A calming purple card with serene floral designs.",
         "backDetails": "Material: Matte Paper, Dimensions: 5x7 inches, Includes: Envelope",
         "price": 200,
-        "uploadTime": "2025-08-02T11:13:00+05:30"
-    },
-    {
-        "id": "card-GoldenAccents",
-        "name": "Golden Accents",
-        "image": "10.png",
-        "backImage": "10.png",
-        "description": "A luxurious card with golden accents for an opulent celebration.",
-        "backDetails": "Material: Premium Cardstock, Dimensions: 6x8 inches, Includes: Envelope & Insert",
-        "price": 280,
         "uploadTime": "2025-08-02T11:13:00+05:30"
     }
 ]
