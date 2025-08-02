@@ -80,7 +80,7 @@
         .card-flip-container {
             position: relative;
             width: 100%;
-            height: 300px;
+            height: 400px;
             perspective: 1000px;
         }
         .card-flip-inner {
@@ -111,6 +111,67 @@
             padding: 1rem;
             overflow-y: auto;
         }
+        .carousel-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        .carousel-slide {
+            display: none;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+        .carousel-slide.active {
+            display: block;
+            opacity: 1;
+        }
+        .carousel-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 1rem;
+        }
+        .carousel-nav {
+            position: absolute;
+            top: 50%;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+        .carousel-nav button {
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            width: 2.5rem;
+            height: 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease, background 0.3s ease;
+            pointer-events: auto;
+        }
+        .carousel-nav button:hover {
+            background: rgba(0, 0, 0, 0.8);
+            transform: scale(1.1);
+        }
+        .carousel-nav button:disabled {
+            display: none;
+        }
+        @media (max-width: 640px) {
+            .carousel-nav button {
+                font-size: 1.25rem;
+                width: 2rem;
+                height: 2rem;
+            }
+        }
 
         @media (min-width: 768px) {
             #desktop-menu {
@@ -127,10 +188,6 @@
         <div class="flex justify-between items-center">
             <a href="#" class="flex items-center space-x-2 logo-container">
                 <img src="LOGO-SIMPLEX-600PX.png" alt="Logo" class="h-10">
-                <div>
-                    <h1 class="text-xl font-bold">COMPANY</h1>
-                    <p class="text-sm text-gray-500">TAGLINE HERE</p>
-                </div>
             </a>
             <button id="menu-btn" class="md:hidden text-3xl focus:outline-none">
                 <i class="fas fa-bars"></i>
@@ -179,10 +236,16 @@
             <div class="card-flip-container">
                 <div class="card-flip-inner">
                     <div class="card-front">
-                        <img id="modal-image" src="" alt="Card Image" class="w-full h-full object-contain rounded-lg">
+                        <div class="carousel-container">
+                            <div id="modal-carousel" class="carousel"></div>
+                            <div class="carousel-nav">
+                                <button id="prev-btn" class="carousel-prev"><i class="fas fa-chevron-left"></i></button>
+                                <button id="next-btn" class="carousel-next"><i class="fas fa-chevron-right"></i></button>
+                            </div>
+                        </div>
                     </div>
                     <div class="card-back flex flex-col items-center justify-center">
-                        <img id="modal-back-image" src="" alt="Card Back" class="w-full h-auto max-h-40 object-contain mb-4">
+                        <img id="modal-back-image" src="" alt="Card Back" class="w-full h-full object-contain rounded-lg mb-4">
                         <p id="modal-back-details" class="text-gray-600 text-sm"></p>
                     </div>
                 </div>
@@ -321,7 +384,7 @@
         const galleryGrid = document.getElementById('gallery-grid');
         const cardModal = document.getElementById('card-modal');
         const closeModalBtn = document.getElementById('close-modal-btn');
-        const modalImage = document.getElementById('modal-image');
+        const modalCarousel = document.getElementById('modal-carousel');
         const modalBackImage = document.getElementById('modal-back-image');
         const modalTitle = document.getElementById('modal-title');
         const modalDescription = document.getElementById('modal-description');
@@ -331,6 +394,10 @@
         const modalFavoriteBtn = document.getElementById('modal-favorite-btn');
         const modalShareBtn = document.getElementById('modal-share-btn');
         const cardFlipInner = document.querySelector('.card-flip-inner');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        let currentImageIndex = 0;
+        let images = [];
 
         function initGallery() {
             fetch('cards.json')
@@ -340,15 +407,15 @@
                     cards.forEach(card => {
                         const cardElement = document.createElement('div');
                         cardElement.classList.add('gallery-item');
-                        cardElement.dataset.imageSrc = card.image;
-                        cardElement.dataset.backImage = card.backImage;
+                        cardElement.dataset.imageSrc = Array.isArray(card.images) ? JSON.stringify(card.images) : JSON.stringify([card.images]);
+                        cardElement.dataset.backImage = card.backImage || '';
                         cardElement.dataset.cardName = card.name;
                         cardElement.dataset.cardId = card.id;
                         cardElement.dataset.description = card.description;
                         cardElement.dataset.backDetails = card.backDetails;
                         cardElement.dataset.price = card.price;
                         cardElement.innerHTML = `
-                            <img src="${card.image}" alt="${card.name}" class="gallery-item-image">
+                            <img src="${Array.isArray(card.images) ? card.images[0] : card.images}" alt="${card.name}" class="gallery-item-image">
                             <div class="gallery-item-content flex justify-between items-center">
                                 <span class="font-semibold text-lg text-gray-800">${card.name}</span>
                                 <div class="flex space-x-2">
@@ -369,7 +436,7 @@
                 if (!item) return;
 
                 const cardId = item.dataset.cardId;
-                const imageSrc = item.dataset.imageSrc;
+                const imageSrc = JSON.parse(item.dataset.imageSrc);
                 const backImage = item.dataset.backImage;
                 const cardName = item.dataset.cardName;
                 const description = item.dataset.description;
@@ -379,7 +446,7 @@
                 if (e.target.closest('.favorite-btn')) {
                     toggleLike(cardId);
                 } else if (e.target.closest('.share-btn')) {
-                    shareCard(imageSrc, cardName, cardId);
+                    shareCard(imageSrc, cardName, description, backDetails, cardId);
                 } else if (e.target.closest('.gallery-item-image')) {
                     openModal(imageSrc, backImage, cardName, description, backDetails, price, cardId);
                 }
@@ -424,34 +491,47 @@
             }
         }
 
-        async function shareCard(imageSrc, cardName, cardId) {
-            const urlToShare = `${window.location.origin}${window.location.pathname}#card=${cardId}`;
-            const shareData = {
-                title: `Check out this wedding card: ${cardName}`,
-                text: `I found this beautiful wedding card design! Click the link to view it.`,
-                url: urlToShare,
-            };
-
-            if (navigator.share) {
-                try {
-                    await navigator.share(shareData);
-                    console.log('Card shared successfully');
-                } catch (error) {
-                    console.error('Error sharing:', error);
-                    fallbackShare(urlToShare);
-                }
-            } else {
-                fallbackShare(urlToShare);
-            }
+        function shareCard(imageSrc, cardName, description, backDetails, cardId) {
+            const shareUrl = `/share.php?id=${encodeURIComponent(cardId)}`;
+            fetch(shareUrl, { mode: 'cors' })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status} - ${response.statusText}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        const shareLink = data.shareLink;
+                        // Fallback for clipboard API
+                        if (navigator.clipboard && navigator.clipboard.writeText) {
+                            navigator.clipboard.writeText(shareLink).then(() => {
+                                alert(`Share link copied to clipboard: ${shareLink}`);
+                            }).catch(err => {
+                                showCopyFallback(shareLink);
+                            });
+                        } else {
+                            showCopyFallback(shareLink);
+                        }
+                    } else {
+                        console.error('Share failed:', data.error);
+                        alert(`Share failed: ${data.error}. Please try again.`);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching share URL:', error.message);
+                    alert(`Error sharing card. Please check server connection or try again later. Details: ${error.message}`);
+                });
         }
 
-        function fallbackShare(url) {
-            navigator.clipboard.writeText(url).then(() => {
-                alert(`Link copied to clipboard! Share this link to view the card: ${url}`);
-            }).catch(err => {
-                console.error('Error copying to clipboard:', err);
-                alert(`Unable to copy link. Please manually copy: ${url}`);
-            });
+        function showCopyFallback(shareLink) {
+            const tempInput = document.createElement('input');
+            tempInput.value = shareLink;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+            alert(`Share link copied to clipboard: ${shareLink}. (Fallback method used)`);
         }
 
         function initModal() {
@@ -463,7 +543,7 @@
                 toggleLike(modalFavoriteBtn.dataset.cardId);
             });
             modalShareBtn.addEventListener('click', () => {
-                shareCard(modalImage.src, modalTitle.textContent, modalFavoriteBtn.dataset.cardId);
+                shareCard(images, modalTitle.textContent, modalDescription.textContent, modalBackDetails.textContent, modalFavoriteBtn.dataset.cardId);
             });
             modalBuyBtn.addEventListener('click', () => {
                 const cardName = modalTitle.textContent;
@@ -472,17 +552,40 @@
                 const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
                 window.open(whatsappUrl, '_blank');
             });
-            modalImage.addEventListener('click', () => {
+            modalCarousel.addEventListener('click', () => {
                 cardFlipInner.classList.toggle('flipped');
             });
             modalBackImage.addEventListener('click', () => {
                 cardFlipInner.classList.toggle('flipped');
             });
+            prevBtn.addEventListener('click', () => {
+                currentImageIndex = (currentImageIndex - 1 + images.length) % images.length;
+                updateCarousel();
+            });
+            nextBtn.addEventListener('click', () => {
+                currentImageIndex = (currentImageIndex + 1) % images.length;
+                updateCarousel();
+            });
+        }
+
+        function updateCarousel() {
+            modalCarousel.innerHTML = '';
+            images.forEach((src, index) => {
+                const slide = document.createElement('div');
+                slide.classList.add('carousel-slide');
+                if (index === currentImageIndex) slide.classList.add('active');
+                slide.innerHTML = `<img src="${src}" alt="Card Image">`;
+                modalCarousel.appendChild(slide);
+            });
+            prevBtn.disabled = images.length <= 1;
+            nextBtn.disabled = images.length <= 1;
         }
 
         function openModal(imageSrc, backImage, cardName, description, backDetails, price, cardId) {
-            modalImage.src = imageSrc;
-            modalBackImage.src = backImage;
+            images = Array.isArray(imageSrc) ? imageSrc : [imageSrc];
+            currentImageIndex = 0;
+            updateCarousel();
+            modalBackImage.src = backImage || '';
             modalTitle.textContent = cardName;
             modalDescription.textContent = description;
             modalBackDetails.textContent = backDetails;
@@ -510,7 +613,7 @@
                     .then(cards => {
                         const card = cards.find(c => c.id === cardId);
                         if (card) {
-                            openModal(card.image, card.backImage, card.name, card.description, card.backDetails, card.price, card.id);
+                            openModal(card.images, card.backImage, card.name, card.description, card.backDetails, card.price, card.id);
                         }
                     })
                     .catch(error => console.error('Error checking URL card:', error));
