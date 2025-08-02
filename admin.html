@@ -27,7 +27,7 @@
         <div class="flex items-center space-x-2">
             <img src="LOGO-SIMPLEX-600PX.png" alt="Logo" class="h-10">
             <div>
-                <h1 class="text-xl font-bold">COMPANY - Admin Panel</h1>
+                <h1 class="text-xl font-bold"> Admin Panel</h1>
                 <p class="text-sm text-gray-500">Manage Wedding Cards</p>
             </div>
         </div>
@@ -60,9 +60,9 @@
                         <input type="number" id="price" name="price" required class="w-full p-2 border rounded focus:outline-none focus:border-purple-600">
                     </div>
                     <div>
-                        <label for="image-file" class="block text-sm font-medium text-gray-700">Front Image (jpg, png, jpeg)</label>
-                        <input type="file" id="image-file" name="image_file" accept=".jpg,.png,.jpeg" class="w-full p-2 border rounded">
-                        <input type="text" id="image-url" name="image_url" placeholder="Or enter image URL" class="w-full p-2 border rounded mt-2 focus:outline-none focus:border-purple-600">
+                        <label for="image-files" class="block text-sm font-medium text-gray-700">Front Images (jpg, png, jpeg, multiple allowed)</label>
+                        <input type="file" id="image-files" name="image_files[]" accept=".jpg,.png,.jpeg" multiple class="w-full p-2 border rounded">
+                        <input type="text" id="image-urls" name="image_urls" placeholder="Or enter image URLs (comma-separated)" class="w-full p-2 border rounded mt-2 focus:outline-none focus:border-purple-600">
                     </div>
                     <div>
                         <label for="back-image-file" class="block text-sm font-medium text-gray-700">Back Image (jpg, png, jpeg)</label>
@@ -115,7 +115,7 @@
                     cards.forEach(card => {
                         const row = document.createElement('tr');
                         row.innerHTML = `
-                            <td class="p-2"><img src="${card.image}" alt="${card.name}"></td>
+                            <td class="p-2"><img src="${card.images[0]}" alt="${card.name}"></td>
                             <td class="p-2">${card.name}</td>
                             <td class="p-2">${card.description}</td>
                             <td class="p-2">₹${card.price}</td>
@@ -138,14 +138,14 @@
             const errorDiv = document.getElementById('form-error');
 
             form.addEventListener('submit', (e) => {
-                const imageFile = document.getElementById('image-file').files[0];
+                const imageFiles = document.getElementById('image-files').files;
+                const imageUrls = document.getElementById('image-urls').value;
                 const backImageFile = document.getElementById('back-image-file').files[0];
-                const imageUrl = document.getElementById('image-url').value;
                 const backImageUrl = document.getElementById('back-image-url').value;
 
-                if (!imageFile && !imageUrl) {
+                if (imageFiles.length === 0 && !imageUrls) {
                     e.preventDefault();
-                    errorDiv.textContent = 'Please provide either a front image file or URL.';
+                    errorDiv.textContent = 'Please provide at least one front image file or URL.';
                     errorDiv.classList.remove('hidden');
                     return;
                 }
@@ -178,7 +178,7 @@
                         document.getElementById('description').value = card.description;
                         document.getElementById('back-details').value = card.backDetails;
                         document.getElementById('price').value = card.price;
-                        document.getElementById('image-url').value = card.image;
+                        document.getElementById('image-urls').value = card.images.join(', ');
                         document.getElementById('back-image-url').value = card.backImage;
                         document.getElementById('edit-btn').classList.remove('hidden');
                         document.getElementById('cancel-btn').classList.remove('hidden');
