@@ -2,7 +2,7 @@
 header('Content-Type: application/json');
 
 $jsonFile = 'cards.json';
-$uploadDir = 'uploads/';
+$uploadDir = 'Uploads/';
 $allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
 $debugLog = 'debug.log';
 
@@ -70,6 +70,55 @@ function validateImage($file) {
 
 function handleImageUpload($fileInput, $urlInput, $prefix) {
     global $uploadDir;
+    $imagePaths = [];
+
+    if (!empty($_FILES[$fileInput]['name'][0])) {
+        foreach ($_FILES[$fileInput]['name'] as $index => $name) {
+            if ($_FILES[$fileInput]['error'][$index] === UPLOAD_ERR_NO_FILE) continue;
+            $file = [
+                'name' => $_FILES[$fileInput]['name'][$index],
+                'type' => $_FILES[$fileInput]['type'][$index],
+                'tmp_name' => $_FILES[$fileInput]['tmp_name'][$index],
+                'error' => $_FILES[$fileInput]['error'][$index],
+                'size' => $_FILES[$fileInput]['size'][$index]
+            ];
+            $validation = validateImage($file);
+            if (!$validation['success']) {
+                logDebug("Image upload validation failed for $fileInput[$index]: " . $validation['error']);
+                return $validation;
+            }
+            $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
+            $filename = $prefix . '_' . time() . '_' . uniqid() . '.' . $ext;
+            $destination = $uploadDir . $filename;
+            if (move_uploaded_file($file['tmp_name'], $destination)) {
+                logDebug("Successfully uploaded $fileInput[$index] to $destination");
+                $imagePaths[] = $destination;
+            } else {
+                logDebug("Failed to move uploaded file for $fileInput[$index] to $destination");
+                return ['success' => false, 'error' => "Failed to move uploaded file for $fileInput[$index]"];
+            }
+        }
+    } elseif (!empty($urlInput)) {
+        $urls = array_filter(array_map('trim', explode(',', $urlInput)));
+        foreach ($urls as $url) {
+            if (filter_var($url, FILTER_VALIDATE_URL)) {
+                logDebug("Using URL for $fileInput: $url");
+                $imagePaths[] = $url;
+            } else {
+                logDebug("Invalid URL for $fileInput: $url");
+                return ['success' => false, 'error' => "Invalid URL: $url"];
+            }
+        }
+    }
+    if (empty($imagePaths)) {
+        logDebug("No $fileInput provided or file upload skipped");
+        return ['success' => false, 'error' => "No $fileInput provided"];
+    }
+    return ['success' => true, 'paths' => $imagePaths];
+}
+
+function handleSingleImageUpload($fileInput, $urlInput, $prefix) {
+    global $uploadDir;
     if (!empty($_FILES[$fileInput]['name']) && $_FILES[$fileInput]['error'] !== UPLOAD_ERR_NO_FILE) {
         $validation = validateImage($_FILES[$fileInput]);
         if (!$validation['success']) {
@@ -87,7 +136,6 @@ function handleImageUpload($fileInput, $urlInput, $prefix) {
             return ['success' => false, 'error' => "Failed to move uploaded file for $fileInput"];
         }
     } elseif (!empty($urlInput)) {
-        // Validate URL (basic check)
         if (filter_var($urlInput, FILTER_VALIDATE_URL)) {
             logDebug("Using URL for $fileInput: $urlInput");
             return ['success' => true, 'path' => $urlInput];
@@ -133,16 +181,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
 
-        // Handle front image
-        $frontImageResult = handleImageUpload('image_file', $_POST['image_url'] ?? '', 'front');
-        if (!$frontImageResult['success'] && empty($_POST['image_url'])) {
-            echo json_encode($frontImageResult);
+        // Handle front images
+        $frontImagesResult = handleImageUpload('image_files', $_POST['image_urls'] ?? '', 'front');
+        if (!$frontImagesResult['success']) {
+            echo json_encode($frontImagesResult);
             exit;
         }
 
         // Handle back image
-        $backImageResult = handleImageUpload('back_image_file', $_POST['back_image_url'] ?? '', 'back');
-        if (!$backImageResult['success'] && empty($_POST['back_image_url'])) {
+        $backImageResult = handleSingleImageUpload('back_image_file', $_POST['back_image_url'] ?? '', 'back');
+        if (!$backImageResult['success']) {
             echo json_encode($backImageResult);
             exit;
         }
@@ -150,7 +198,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $card = [
             'id' => $cardId,
             'name' => $cardName,
-            'image' => $frontImageResult['path'],
+            'images' => $frontImagesResult['paths'],
             'backImage' => $backImageResult['path'],
             'description' => $description,
             'backDetails' => $backDetails,
